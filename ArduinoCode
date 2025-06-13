@@ -1,0 +1,54 @@
+/*
+  Teensy 4.1 USB Game Controller
+
+  Configures Teensy as a USB Game Controller. Reads two joysticks and three buttons.
+  Requires "Joystick" USB Type selected in Tools > USB Type.
+
+  Wiring:
+  - Joystick 1: A4 (X), A5 (Y)
+  - Joystick 2: A0 (X), A1 (Y)
+  - Buttons (INPUT_PULLUP, C1 to pin, NO1 to GND):
+    - Green: Pin 4 (Joystick Button 1)
+    - Blue: Pin 3 (Joystick Button 2)
+    - Red: Pin 2 (Joystick Button 3)
+*/
+
+// --- Pin Assignments ---
+const int JOYSTICK1_X_PIN = A4;
+const int JOYSTICK1_Y_PIN = A5;
+
+const int JOYSTICK2_X_PIN = A0;
+const int JOYSTICK2_Y_PIN = A1;
+
+const int GREEN_BUTTON_PIN = 4;
+const int BLUE_BUTTON_PIN  = 3;
+const int RED_BUTTON_PIN   = 2;
+
+
+void setup() {
+  Serial.begin(9600);
+  while (!Serial && millis() < 2000);
+
+  pinMode(GREEN_BUTTON_PIN, INPUT_PULLUP);
+  pinMode(BLUE_BUTTON_PIN, INPUT_PULLUP);
+  pinMode(RED_BUTTON_PIN, INPUT_PULLUP);
+}
+
+
+void loop() {
+  // Map Joystick 1 to USB Joystick X and Y axes
+  Joystick.X(analogRead(JOYSTICK1_X_PIN));
+  Joystick.Y(analogRead(JOYSTICK1_Y_PIN));
+
+  // Map Joystick 2 to USB Joystick Z and Z-rotate axes
+  Joystick.Z(analogRead(JOYSTICK2_X_PIN));
+  Joystick.Zrotate(analogRead(JOYSTICK2_Y_PIN));
+
+  // Set USB Joystick button states (LOW = pressed)
+  Joystick.button(1, digitalRead(GREEN_BUTTON_PIN) == LOW ? 1 : 0);
+  Joystick.button(2, digitalRead(BLUE_BUTTON_PIN)  == LOW ? 1 : 0);
+  Joystick.button(3, digitalRead(RED_BUTTON_PIN)   == LOW ? 1 : 0);
+
+  delay(50); // Update rate control
+}
+
